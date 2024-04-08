@@ -23,12 +23,9 @@ def decrypt_vignere(ciphertext, key) -> str:
 
     for i in range(len(normalized_ct)):
         c = normalized_ct[i]
-        key = normalized_key[key_ctr]
+        r = normalized_key[key_ctr]
 
-        row = table[key]
-        idx = row.index(c)
-
-        plaintext += chr(idx + 97)
+        plaintext += chr(table[r][c] + ord('a'))
 
     return plaintext
 
@@ -36,8 +33,8 @@ def decrypt_caesar(ciphertext, shift) -> str:
     plaintext = ''
     for c in ciphertext:
         normalized_c = string_to_ascii(c, normalize=True)
-        shifted_c = (normalized_c + shift) % 26
-        plaintext += chr(shifted_c + 97)
+        shifted_c = ((normalized_c - shift + 26) % 26)
+        plaintext += chr(shifted_c + ord('a'))
 
     return plaintext
 

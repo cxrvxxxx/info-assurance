@@ -41,7 +41,7 @@ def chunkify(message, chunk_size=16, encoding='utf-8'):
 
 def dechunkify(chunks, encoding='utf-8'):
     concatenated_bytes = b''.join(chunks)
-    message = concatenated_bytes.replace('@'.encode(encoding), b'')  # Remove padding bytes
+    message = concatenated_bytes.replace('@'.encode(encoding), b'')
     message = message.rstrip(b'\x00')
     return message.decode(encoding)
 

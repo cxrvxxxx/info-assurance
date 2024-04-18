@@ -8,11 +8,9 @@ import random
 def encrypt_chunk(chunk, key):
     key = key.encode('utf-8')
 
-    # Create an AES cipher object with the provided key
     cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
     encryptor = cipher.encryptor()
 
-    # Encrypt the chunk
     encrypted_chunk = encryptor.update(chunk) + encryptor.finalize()
 
     return encrypted_chunk
@@ -20,11 +18,9 @@ def encrypt_chunk(chunk, key):
 def decrypt_chunk(encrypted_chunk, key):
     key = key.encode('utf-8')
 
-    # Create an AES cipher object with the provided key
     cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
     decryptor = cipher.decryptor()
 
-    # Decrypt the chunk
     decrypted_chunk = decryptor.update(encrypted_chunk) + decryptor.finalize()
 
     return decrypted_chunk

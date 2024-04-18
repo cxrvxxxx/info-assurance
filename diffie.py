@@ -17,6 +17,18 @@ def encrypt_chunk(chunk, key):
 
     return encrypted_chunk
 
+def decrypt_chunk(encrypted_chunk, key):
+    key = key.encode('utf-8')
+
+    # Create an AES cipher object with the provided key
+    cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
+    decryptor = cipher.decryptor()
+
+    # Decrypt the chunk
+    decrypted_chunk = decryptor.update(encrypted_chunk) + decryptor.finalize()
+
+    return decrypted_chunk
+
 def chunkify(message, chunk_size=16, encoding='utf-8'):
     message_bytes = message.encode(encoding)
 
@@ -30,6 +42,12 @@ def chunkify(message, chunk_size=16, encoding='utf-8'):
         chunks.append(chunk)
 
     return chunks
+
+def dechunkify(chunks, encoding='utf-8'):
+    concatenated_bytes = b''.join(chunks)
+    message = concatenated_bytes.replace('@'.encode(encoding), b'')  # Remove padding bytes
+    message = message.rstrip(b'\x00')
+    return message.decode(encoding)
 
 def print_chunks(chunks):
     for i, chunk in enumerate(chunks):
@@ -57,6 +75,8 @@ def main():
     p = 199
     g = 127
 
+    print()
+
     p_key_a = generate_key()
     print(f"User A PRIVATE_KEY: {p_key_a}")
 
@@ -69,6 +89,8 @@ def main():
     pub_b = (g**ord(p_key_b)) % p
     print(f"User B PUBLIC_VALUE: {pub_b}")
 
+    print()
+
     s_key_a = (pub_b**ord(p_key_a)) % p
     print(f"Shared key (A compute): {to_aes(s_key_a)}")
 
@@ -77,6 +99,8 @@ def main():
 
     chunks = chunkify(message)
 
+    print()
+
     print("Message chunks: ")
     print_chunks(chunks)
 
@@ -84,8 +108,25 @@ def main():
     for chunk in chunks:
         encrypted.append(encrypt_chunk(chunk, to_aes(s_key_a)))
 
+    print()
+
     print("Encrypted chunks:")
     print_chunks(encrypted)
+
+    print()
+
+    decrypted = []
+    for encrypted_chunk in encrypted:
+        decrypted.append(decrypt_chunk(encrypted_chunk, to_aes(s_key_a)))
+    
+    print("Decrypted chunks:")
+    print_chunks(decrypted)
+
+    dechunkified = dechunkify(decrypted)
+
+    print()
+
+    print(f"Decoded message: {dechunkified}")
 
 if __name__ == '__main__':
     main()
